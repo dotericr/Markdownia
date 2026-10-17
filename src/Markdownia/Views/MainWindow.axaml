@@ -1,0 +1,337 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Markdownia.Controls"
+        xmlns:ae="using:AvaloniaEdit"
+        x:Class="Markdownia.Views.MainWindow"
+        Title="Markdownia"
+        Width="1400" Height="900" MinWidth="720" MinHeight="420"
+        Background="{DynamicResource Md.ChromeBrush}"
+        DragDrop.AllowDrop="True">
+
+  <DockPanel>
+
+    <!-- ===================================================================== Ribbon -->
+    <Border DockPanel.Dock="Top" Background="{DynamicResource Md.ChromeBrush}">
+      <StackPanel>
+
+        <!-- Tab row -->
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,0">
+          <Button Name="FileButton" Classes="file-tab" Content="File">
+            <Button.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                <MenuItem Header="_New" InputGesture="Ctrl+N" Click="OnNew">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.FileOutline}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Open…" InputGesture="Ctrl+O" Click="OnOpen">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.FolderOpenOutline}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="RecentMenu" Header="Open _Recent">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.History}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="_Save" InputGesture="Ctrl+S" Click="OnSave">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.ContentSave}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _As…" InputGesture="Ctrl+Shift+S" Click="OnSaveAs">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.ContentSaveEditOutline}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Export as HTML…" Click="OnExportHtml">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.Export}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Markdown _Guide" Click="OnShowGuide">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.LanguageMarkdownOutline}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="DefaultAppItem" Header="Open Markdown Files with Markdownia" Click="OnMakeDefaultApp" IsVisible="False">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.Check}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="E_xit" Click="OnExit">
+                  <MenuItem.Icon><PathIcon Data="{StaticResource Icon.ExitToApp}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Bottom">
+            <!-- Quick access toolbar -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,2">
+              <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.ContentSave}" Label="Save (Ctrl+S)" Click="OnSave" />
+              <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.Undo}" Label="Undo (Ctrl+Z)" Click="OnUndo" />
+              <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.Redo}" Label="Redo (Ctrl+Y)" Click="OnRedo" />
+              <Border Width="1" Height="18" Margin="8,0,0,0" Background="{DynamicResource Md.ChromeBorderBrush}" />
+            </StackPanel>
+            <RadioButton Name="TabHome" Classes="ribbon-tab" GroupName="ribbon" Content="Home" IsChecked="True" />
+            <RadioButton Name="TabInsert" Classes="ribbon-tab" GroupName="ribbon" Content="Insert" />
+            <RadioButton Name="TabDesign" Classes="ribbon-tab" GroupName="ribbon" Content="Design" />
+            <RadioButton Name="TabView" Classes="ribbon-tab" GroupName="ribbon" Content="View" />
+          </StackPanel>
+
+          <c:RibbonButton Name="CollapseRibbonButton" Grid.Column="2" Size="Icon" Margin="0,0,8,0"
+                          Icon="{StaticResource Icon.ChevronUp}" ToolTip.Tip="Collapse the ribbon (Ctrl+F1)"
+                          Click="OnToggleRibbon" />
+        </Grid>
+
+        <!-- Ribbon body -->
+        <Border Name="RibbonBody" Classes="ribbon-body" Height="104"
+                Background="{DynamicResource Md.RibbonBrush}"
+                BorderBrush="{DynamicResource Md.ChromeBorderBrush}" BorderThickness="0,1,0,1">
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+          <Panel Margin="4,0">
+
+            <!-- HOME -->
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding #TabHome.IsChecked}">
+              <c:RibbonGroup Header="Clipboard">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.ContentPaste}" Label="Paste" Click="OnPaste" ToolTip.Tip="Paste (Ctrl+V)" />
+                  <StackPanel VerticalAlignment="Top">
+                    <c:RibbonButton Icon="{StaticResource Icon.ContentCut}" Label="Cut" Click="OnCut" ToolTip.Tip="Cut (Ctrl+X)" />
+                    <c:RibbonButton Icon="{StaticResource Icon.ContentCopy}" Label="Copy" Click="OnCopy" ToolTip.Tip="Copy (Ctrl+C)" />
+                    <c:RibbonButton Icon="{StaticResource Icon.SelectAll}" Label="Select All" Click="OnSelectAll" ToolTip.Tip="Select all (Ctrl+A)" />
+                  </StackPanel>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Font">
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                  <StackPanel Orientation="Horizontal">
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatBold}" Label="Bold (Ctrl+B)" Tag="bold" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatItalic}" Label="Italic (Ctrl+I)" Tag="italic" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatUnderline}" Label="Underline / inserted text (Ctrl+U)" Tag="underline" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatStrikethroughVariant}" Label="Strikethrough (Ctrl+Shift+X)" Tag="strike" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.CodeTags}" Label="Inline code (Ctrl+E)" Tag="code" Click="OnFormat" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatSuperscript}" Label="Superscript (Ctrl+Shift+=)" Tag="sup" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatSubscript}" Label="Subscript (Ctrl+=)" Tag="sub" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.Marker}" Label="Highlight (Ctrl+Shift+H)" Tag="mark" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FunctionVariant}" Label="Inline equation (Ctrl+M)" Tag="math" Click="OnFormat" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatClear}" Label="Clear formatting (Ctrl+Space)" Tag="clear" Click="OnFormat" />
+                  </StackPanel>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Paragraph">
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                  <StackPanel Orientation="Horizontal">
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatListBulleted}" Label="Bulleted list (Ctrl+Shift+8)" Tag="bullet" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatListNumbered}" Label="Numbered list (Ctrl+Shift+7)" Tag="numbered" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatListChecks}" Label="Task list (Ctrl+Shift+9)" Tag="task" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatIndentDecrease}" Label="Decrease indent (Shift+Tab)" Tag="outdent" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatIndentIncrease}" Label="Increase indent (Tab)" Tag="indent" Click="OnParagraph" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatQuoteClose}" Label="Block quote (Ctrl+Shift+Q)" Tag="quote" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.CodeBraces}" Label="Code block" Tag="codeblock" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.Minus}" Label="Horizontal line" Tag="rule" Click="OnParagraph" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatPilcrow}" Label="Normal text (Ctrl+0)" Tag="normal" Click="OnParagraph" />
+                  </StackPanel>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Styles">
+                <StackPanel Name="StyleGallery" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,2,0,0" />
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Editing">
+                <StackPanel VerticalAlignment="Top">
+                  <c:RibbonButton Icon="{StaticResource Icon.Magnify}" Label="Find" Click="OnFind" ToolTip.Tip="Find (Ctrl+F)" />
+                  <c:RibbonButton Icon="{StaticResource Icon.FindReplace}" Label="Replace" Click="OnReplace" ToolTip.Tip="Replace (Ctrl+H)" />
+                </StackPanel>
+              </c:RibbonGroup>
+            </StackPanel>
+
+            <!-- INSERT -->
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding #TabInsert.IsChecked}">
+              <c:RibbonGroup Header="Links">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.LinkVariant}" Label="Link" Click="OnInsertLink" ToolTip.Tip="Insert a link (Ctrl+K)" />
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.ImageOutline}" Label="Picture" Click="OnInsertImage" ToolTip.Tip="Insert a picture from a file" />
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Tables">
+                <c:RibbonButton Name="TableButton" Size="Large" Icon="{StaticResource Icon.Table}" Label="Table" ShowChevron="True" ToolTip.Tip="Insert a table">
+                  <c:RibbonButton.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedLeft">
+                      <StackPanel Spacing="6">
+                        <TextBlock Name="TablePickerLabel" Text="Insert Table" FontSize="12" />
+                        <UniformGrid Name="TablePicker" Rows="8" Columns="10" />
+                      </StackPanel>
+                    </Flyout>
+                  </c:RibbonButton.Flyout>
+                </c:RibbonButton>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Code">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Name="CodeBlockButton" Size="Large" Icon="{StaticResource Icon.CodeBlockBraces}" Label="Code Block" ShowChevron="True"
+                                  ToolTip.Tip="Insert a fenced code block with syntax highlighting" />
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.CodeTags}" Label="Inline Code" Tag="code" Click="OnFormat" ToolTip.Tip="Inline code (Ctrl+E)" />
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Math">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.Sigma}" Label="Equation" Click="OnInsertMathBlock" ToolTip.Tip="Insert a display equation (Alt+=)" />
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.FunctionVariant}" Label="Inline Math" Tag="math" Click="OnFormat" ToolTip.Tip="Inline equation (Ctrl+M)" />
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="References">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.NoteTextOutline}" Label="Footnote" Click="OnInsertFootnote" ToolTip.Tip="Insert a footnote (Ctrl+Alt+F)" />
+                  <StackPanel VerticalAlignment="Top">
+                    <c:RibbonButton Icon="{StaticResource Icon.FormatLetterCase}" Label="Abbreviation" Click="OnInsertAbbreviation" ToolTip.Tip="Define an abbreviation; hover it in the preview to see its meaning" />
+                    <c:RibbonButton Icon="{StaticResource Icon.FormatListText}" Label="Definition" Click="OnInsertDefinition" ToolTip.Tip="Insert a definition list entry" />
+                    <c:RibbonButton Icon="{StaticResource Icon.Anchor}" Label="Heading Link" Name="HeadingLinkButton" ShowChevron="True" ToolTip.Tip="Link to a heading in this document" />
+                  </StackPanel>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Callouts">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonButton Size="Large" Icon="{StaticResource Icon.AlertCircleOutline}" Label="Alert" ShowChevron="True" ToolTip.Tip="Insert a GitHub alert (note, tip, warning…)">
+                    <c:RibbonButton.Flyout>
+                      <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                        <MenuItem Header="Note" Tag="NOTE" Click="OnInsertAlert" />
+                        <MenuItem Header="Tip" Tag="TIP" Click="OnInsertAlert" />
+                        <MenuItem Header="Important" Tag="IMPORTANT" Click="OnInsertAlert" />
+                        <MenuItem Header="Warning" Tag="WARNING" Click="OnInsertAlert" />
+                        <MenuItem Header="Caution" Tag="CAUTION" Click="OnInsertAlert" />
+                        <Separator />
+                        <MenuItem Header="Fenced div (Pandoc)" Tag="div" Click="OnInsertAlert" />
+                      </MenuFlyout>
+                    </c:RibbonButton.Flyout>
+                  </c:RibbonButton>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Text">
+                <StackPanel VerticalAlignment="Top">
+                  <c:RibbonButton Icon="{StaticResource Icon.Minus}" Label="Horizontal Line" Tag="rule" Click="OnParagraph" />
+                  <c:RibbonButton Icon="{StaticResource Icon.CalendarToday}" Label="Date &amp; Time" Click="OnInsertDate" />
+                  <c:RibbonButton Icon="{StaticResource Icon.EmoticonOutline}" Label="Symbol" ShowChevron="True" Name="SymbolButton" />
+                </StackPanel>
+              </c:RibbonGroup>
+            </StackPanel>
+
+            <!-- DESIGN -->
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding #TabDesign.IsChecked}">
+              <c:RibbonGroup Header="Themes">
+                <StackPanel Name="ThemeGallery" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,2,0,0" />
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Reading Typography">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center">
+                  <TextBlock Classes="ribbon-caption" Text="Font" Margin="0,0,8,0" />
+                  <ComboBox Name="PreviewFontCombo" Grid.Column="1" Width="190" />
+                  <TextBlock Classes="ribbon-caption" Grid.Column="2" Text="Size" Margin="14,0,8,0" />
+                  <StackPanel Grid.Column="3" Orientation="Horizontal">
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeDecrease}" Label="Smaller text (Ctrl+[)" Click="OnPreviewSmaller" />
+                    <TextBlock Name="PreviewSizeText" Classes="ribbon-value" Width="40" Text="18" />
+                    <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeIncrease}" Label="Larger text (Ctrl+])" Click="OnPreviewLarger" />
+                  </StackPanel>
+
+                  <TextBlock Grid.Row="1" Classes="ribbon-caption" Text="Spacing" Margin="0,2,8,0" />
+                  <ComboBox Name="LineSpacingCombo" Grid.Row="1" Grid.Column="1" Width="190" Margin="0,2,0,0" />
+                  <TextBlock Grid.Row="1" Grid.Column="2" Classes="ribbon-caption" Text="Width" Margin="14,2,8,0" />
+                  <ComboBox Name="WidthCombo" Grid.Row="1" Grid.Column="3" Width="110" Margin="0,2,0,0" />
+
+                  <TextBlock Grid.Row="2" Classes="ribbon-caption" Text="Code" Margin="0,2,8,0" />
+                  <ComboBox Name="CodeFontCombo" Grid.Row="2" Grid.Column="1" Width="190" Margin="0,2,0,0" />
+                </Grid>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Text">
+                <StackPanel VerticalAlignment="Top">
+                  <c:RibbonToggleButton Name="JustifyToggle" Icon="{StaticResource Icon.FormatAlignJustify}" Label="Justify" ToolTip.Tip="Justify paragraphs" />
+                  <c:RibbonToggleButton Name="SmartToggle" Icon="{StaticResource Icon.FormatQuoteClose}" Label="Smart Punctuation" ToolTip.Tip="Curly quotes, en/em dashes and ellipses" />
+                  <StackPanel Orientation="Horizontal" Spacing="6" Margin="6,2,0,0">
+                    <TextBlock Classes="ribbon-caption" Text="Rendering" />
+                    <ComboBox Name="RenderingCombo" Width="110" />
+                  </StackPanel>
+                </StackPanel>
+              </c:RibbonGroup>
+            </StackPanel>
+
+            <!-- VIEW -->
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding #TabView.IsChecked}">
+              <c:RibbonGroup Header="Layout">
+                <StackPanel Orientation="Horizontal">
+                  <c:RibbonToggleButton Name="LayoutEditorToggle" Size="Large" Icon="{StaticResource Icon.PencilOutline}" Label="Editor" Tag="editor" Click="OnLayout" ToolTip.Tip="Editor only" />
+                  <c:RibbonToggleButton Name="LayoutSplitToggle" Size="Large" Icon="{StaticResource Icon.ViewSplitVertical}" Label="Split" Tag="split" Click="OnLayout" ToolTip.Tip="Editor and preview side by side" />
+                  <c:RibbonToggleButton Name="LayoutReaderToggle" Size="Large" Icon="{StaticResource Icon.BookOpenPageVariantOutline}" Label="Reader" Tag="reader" Click="OnLayout" ToolTip.Tip="Preview only: collapse the editor (Ctrl+\)" />
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Editor">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <StackPanel VerticalAlignment="Top">
+                    <c:RibbonToggleButton Name="WordWrapToggle" Icon="{StaticResource Icon.Wrap}" Label="Word Wrap" />
+                    <c:RibbonToggleButton Name="LineNumbersToggle" Icon="{StaticResource Icon.Numeric}" Label="Line Numbers" />
+                    <c:RibbonToggleButton Name="SyncScrollToggle" Icon="{StaticResource Icon.ArrowExpandHorizontal}" Label="Sync Scrolling" />
+                  </StackPanel>
+                  <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Top" Margin="8,2,0,0">
+                    <TextBlock Classes="ribbon-caption" Text="Font" Margin="0,0,8,0" />
+                    <ComboBox Name="EditorFontCombo" Grid.Column="1" Width="170" />
+                    <TextBlock Grid.Row="1" Classes="ribbon-caption" Text="Size" Margin="0,2,8,0" />
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,2,0,0">
+                      <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeDecrease}" Label="Smaller editor text" Click="OnEditorSmaller" />
+                      <TextBlock Name="EditorSizeText" Classes="ribbon-value" Width="40" Text="14" />
+                      <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeIncrease}" Label="Larger editor text" Click="OnEditorLarger" />
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </c:RibbonGroup>
+
+              <c:RibbonGroup Header="Navigate">
+                <c:RibbonButton Name="OutlineButton" Size="Large" Icon="{StaticResource Icon.FormatListText}" Label="Outline" ShowChevron="True" ToolTip.Tip="Jump to a heading" />
+              </c:RibbonGroup>
+            </StackPanel>
+          </Panel>
+          </ScrollViewer>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <!-- ================================================================= Status bar -->
+    <Border DockPanel.Dock="Bottom" Classes="status-bar" Height="28" Padding="12,0,8,0"
+            Background="{DynamicResource Md.ChromeBrush}"
+            BorderBrush="{DynamicResource Md.ChromeBorderBrush}" BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="18">
+          <TextBlock Name="WordCountText" Text="0 words" />
+          <TextBlock Name="ReadingTimeText" Text="" />
+          <TextBlock Name="CaretText" Text="Ln 1, Col 1" />
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
+          <c:RibbonToggleButton Name="StatusEditorToggle" Size="Icon" Icon="{StaticResource Icon.PencilOutline}" Label="Editor only" Tag="editor" Click="OnLayout" MinHeight="22" Padding="4,3" />
+          <c:RibbonToggleButton Name="StatusSplitToggle" Size="Icon" Icon="{StaticResource Icon.ViewSplitVertical}" Label="Split view" Tag="split" Click="OnLayout" MinHeight="22" Padding="4,3" />
+          <c:RibbonToggleButton Name="StatusReaderToggle" Size="Icon" Icon="{StaticResource Icon.BookOpenPageVariantOutline}" Label="Reader (collapse editor)" Tag="reader" Click="OnLayout" MinHeight="22" Padding="4,3" />
+          <Border Width="1" Margin="8,6" Background="{DynamicResource Md.ChromeBorderBrush}" />
+          <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeDecrease}" Label="Smaller text" Click="OnPreviewSmaller" MinHeight="22" Padding="4,3" />
+          <Slider Name="ZoomSlider" Width="110" Minimum="12" Maximum="32" SmallChange="1" LargeChange="2"
+                  TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="2,-12,2,-12" />
+          <c:RibbonButton Size="Icon" Icon="{StaticResource Icon.FormatFontSizeIncrease}" Label="Larger text" Click="OnPreviewLarger" MinHeight="22" Padding="4,3" />
+          <TextBlock Name="ZoomText" Text="18 px" Width="44" TextAlignment="Right" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ===================================================================== Panes -->
+    <Grid Name="PaneGrid" ColumnDefinitions="*,Auto,*">
+      <Border Name="EditorHost" Background="{DynamicResource Md.EditorBackgroundBrush}">
+        <ae:TextEditor Name="Editor"
+                       ShowLineNumbers="True"
+                       WordWrap="True"
+                       Padding="12,14,8,14"
+                       Background="Transparent"
+                       Foreground="{DynamicResource Md.EditorForegroundBrush}"
+                       VerticalScrollBarVisibility="Auto" />
+      </Border>
+      <GridSplitter Name="PaneSplitter" Grid.Column="1" Classes="pane-splitter" ResizeDirection="Columns" />
+      <c:MarkdownPreview Name="Preview" Grid.Column="2" Background="{DynamicResource Md.PreviewBackgroundBrush}" />
+    </Grid>
+  </DockPanel>
+</Window>

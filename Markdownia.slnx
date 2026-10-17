@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Markdownia/Markdownia.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Markdownia.Tests/Markdownia.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/IconGen/IconGen.csproj" />
+    <Project Path="tools/Snapshot/Snapshot.csproj" />
+  </Folder>
+</Solution>

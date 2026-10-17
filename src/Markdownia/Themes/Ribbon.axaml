@@ -1,0 +1,170 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Markdownia.Controls">
+
+  <!-- Shared template for ribbon buttons: icon + label, laid out horizontally (small) or stacked (large). -->
+  <ControlTheme x:Key="{x:Type c:RibbonButton}" TargetType="c:RibbonButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.ChromeForegroundBrush}" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="MinHeight" Value="25" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <StackPanel Name="PART_Layout" Orientation="Horizontal" Spacing="6"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+            <PathIcon Name="PART_Icon" Data="{TemplateBinding Icon}" Width="16" Height="16"
+                      Foreground="{TemplateBinding Foreground}"
+                      IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <StackPanel Name="PART_LabelRow" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+              <TextBlock Name="PART_Label" Text="{TemplateBinding Label}" VerticalAlignment="Center"
+                         TextAlignment="Center" Foreground="{TemplateBinding Foreground}" />
+              <PathIcon Name="PART_Chevron" Data="{StaticResource Icon.ChevronDown}" Width="9" Height="9"
+                        VerticalAlignment="Center" Opacity="0.7"
+                        Foreground="{TemplateBinding Foreground}"
+                        IsVisible="{TemplateBinding ShowChevron}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:large">
+      <Setter Property="Padding" Value="6,4,6,3" />
+      <Setter Property="MinWidth" Value="52" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="^:large /template/ StackPanel#PART_Layout">
+      <Setter Property="Orientation" Value="Vertical" />
+      <Setter Property="Spacing" Value="4" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style Selector="^:large /template/ PathIcon#PART_Icon">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+    <Style Selector="^:large /template/ TextBlock#PART_Label">
+      <Setter Property="MaxWidth" Value="68" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="LineHeight" Value="14" />
+    </Style>
+    <Style Selector="^:iconOnly /template/ StackPanel#PART_LabelRow">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:iconOnly">
+      <Setter Property="Padding" Value="5" />
+      <Setter Property="MinWidth" Value="28" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromeHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromePressedBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:RibbonToggleButton}" TargetType="c:RibbonToggleButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.ChromeForegroundBrush}" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="MinHeight" Value="25" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <StackPanel Name="PART_Layout" Orientation="Horizontal" Spacing="6"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+            <PathIcon Name="PART_Icon" Data="{TemplateBinding Icon}" Width="16" Height="16"
+                      Foreground="{TemplateBinding Foreground}"
+                      IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Name="PART_Label" Text="{TemplateBinding Label}" VerticalAlignment="Center"
+                       TextAlignment="Center" Foreground="{TemplateBinding Foreground}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:large">
+      <Setter Property="Padding" Value="6,4,6,3" />
+      <Setter Property="MinWidth" Value="52" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="^:large /template/ StackPanel#PART_Layout">
+      <Setter Property="Orientation" Value="Vertical" />
+      <Setter Property="Spacing" Value="4" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style Selector="^:large /template/ PathIcon#PART_Icon">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+    <Style Selector="^:large /template/ TextBlock#PART_Label">
+      <Setter Property="MaxWidth" Value="68" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="LineHeight" Value="14" />
+    </Style>
+    <Style Selector="^:iconOnly /template/ TextBlock#PART_Label">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:iconOnly">
+      <Setter Property="Padding" Value="5" />
+      <Setter Property="MinWidth" Value="28" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromeHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromePressedBrush}" />
+    </Style>
+    <Style Selector="^:checked /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromeCheckedBrush}" />
+    </Style>
+    <Style Selector="^:checked:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Md.ChromePressedBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <!-- A group: commands on top, caption at the bottom, hairline separator on the right. -->
+  <ControlTheme x:Key="{x:Type c:RibbonGroup}" TargetType="c:RibbonGroup">
+    <Setter Property="Padding" Value="6,4,6,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto">
+          <Grid RowDefinitions="*,Auto" Margin="{TemplateBinding Padding}">
+            <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="1" Text="{TemplateBinding Header}" FontSize="11"
+                       HorizontalAlignment="Center" Margin="0,2,0,3"
+                       Foreground="{DynamicResource Md.ChromeMutedBrush}" />
+          </Grid>
+          <Border Grid.Column="1" Width="1" Margin="0,8,0,8"
+                  Background="{DynamicResource Md.ChromeBorderBrush}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

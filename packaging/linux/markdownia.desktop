@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Markdownia
+GenericName=Markdown Editor
+Comment=Write and read Markdown with a typeset live preview
+Exec=markdownia %f
+Icon=markdownia
+Terminal=false
+Categories=Utility;TextEditor;
+Keywords=markdown;md;editor;viewer;writing;notes;
+MimeType=text/markdown;text/x-markdown;
+StartupNotify=true
+StartupWMClass=Markdownia
