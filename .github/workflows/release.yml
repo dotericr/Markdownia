@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Native AOT prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang zlib1g-dev zip
+
+      - name: Verify release version
+        run: |
+          version=$(sed -n 's|.*<Version>\(.*\)</Version>.*|\1|p' src/Markdownia/Markdownia.csproj | head -n1)
+          test "$version" = "$GITHUB_REF_NAME" || {
+            echo "Tag $GITHUB_REF_NAME does not match project version $version" >&2
+            exit 1
+          }
+
+      - name: Build Debian package
+        env:
+          DEB_MAINTAINER: Markdownia maintainers <noreply@github.com>
+        run: packaging/linux/build-deb.sh linux-x64
+
+      - name: Build Linux binary archive
+        run: |
+          dotnet publish src/Markdownia -c Release -r linux-x64 -o artifacts/linux-x64 -nologo
+          mkdir -p dist
+          cd artifacts/linux-x64
+          zip -q -9 "$GITHUB_WORKSPACE/dist/Markdownia-$GITHUB_REF_NAME-linux-x64.zip" \
+            Markdownia libHarfBuzzSharp.so libSkiaSharp.so
+
+      - name: Archive source
+        run: |
+          git archive --format=zip --prefix="Markdownia-$GITHUB_REF_NAME-source/" \
+            "$GITHUB_SHA" > "dist/Markdownia-$GITHUB_REF_NAME-source.zip"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "artifacts/deb/markdownia_${GITHUB_REF_NAME}_amd64.deb" dist/
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

@@ -64,7 +64,7 @@ It renders the main window and the full document preview offscreen to `out.png` 
 
 ```bash
 packaging/linux/build-deb.sh              # → artifacts/deb/markdownia_<version>_amd64.deb
-sudo apt install ./artifacts/deb/markdownia_0.1.0_amd64.deb
+sudo apt install ./artifacts/deb/markdownia_1.0.0_amd64.deb
 ```
 
 The package installs the program in `/usr/lib/markdownia` with a `markdownia` command, a desktop entry, and icons. It registers Markdownia for Markdown files (`text/markdown`), so it appears in the application menu and under "Open With" for `.md` files. To make it the default app for Markdown files, choose **File › Open Markdown Files with Markdownia**. This menu item appears only in installed builds. The maintainer field comes from `git config user.name`/`user.email`; set `DEB_MAINTAINER="Name <email>"` to override it. The executable needs glibc 2.38 or newer (Ubuntu 24.04, Debian 13 or later). Pass `linux-arm64` to build for ARM, which requires an arm64 cross toolchain.
