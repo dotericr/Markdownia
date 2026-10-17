@@ -1,5 +1,7 @@
 # Markdownia
 
+![The user interface in Split View](screenshot.png)
+
 A Markdown editor and viewer built with .NET 10 and Avalonia 12 and compiled to a single native executable with Native AOT. The editor is on the left and the preview on the right. Collapse the editor to use Markdownia as a pure reader.
 
 The preview is drawn entirely with Avalonia controls. There is no embedded web view. Its main goal is clear, comfortable typography: bundled reading fonts, a limited line length, pixel-snapped line heights, and a choice of text rendering modes.
@@ -7,7 +9,7 @@ The preview is drawn entirely with Avalonia controls. There is no embedded web v
 ## Features
 
 - **Dual pane with a collapsible editor.** Choose Editor, Split or Reader layout from the View tab or the status bar, or press `Ctrl+\`. The splitter position is remembered. With Sync Scrolling on, whichever pane you are scrolling leads and the other follows.
-- **A ribbon-style toolbar** with a File menu, a quick-access toolbar, and Home / Insert / Design / View tabs:
+- **A Word-style ribbon** with a File menu, a quick-access toolbar, and Home / Insert / Design / View tabs:
   - **Home:** clipboard; inline formatting (bold, italic, underline/insert, strikethrough, code, superscript, subscript, highlight, inline math, clear formatting); lists, indentation, quotes; a **Styles gallery** (Normal, Heading 1–4, Quote, Code); find and replace.
   - **Insert:** links, pictures, a hover-grid **table picker**, code blocks with a language menu, equations, footnotes, abbreviations, definition lists, links to headings, GitHub alerts and Pandoc fenced divs, horizontal lines, date, and symbols.
   - **Design:** a **theme gallery**, reading font, text size, line spacing, text width, code font, justification, smart punctuation, and text rendering mode.
@@ -65,7 +67,7 @@ packaging/linux/build-deb.sh              # → artifacts/deb/markdownia_<versio
 sudo apt install ./artifacts/deb/markdownia_0.1.0_amd64.deb
 ```
 
-The package installs the program in `/usr/lib/markdownia` with a `markdownia` command, a desktop entry, and icons. It registers Markdownia for Markdown files (`text/markdown`), so it appears in the application menu and under "Open With" for `.md` files. To make it the default app for Markdown files, choose **File › Open Markdown Files with Markdownia**. This menu item appears only in installed builds. The executable needs glibc 2.38 or newer (Ubuntu 24.04, Debian 13 or later). Pass `linux-arm64` to build for ARM, which requires an arm64 cross toolchain.
+The package installs the program in `/usr/lib/markdownia` with a `markdownia` command, a desktop entry, and icons. It registers Markdownia for Markdown files (`text/markdown`), so it appears in the application menu and under "Open With" for `.md` files. To make it the default app for Markdown files, choose **File › Open Markdown Files with Markdownia**. This menu item appears only in installed builds. The maintainer field comes from `git config user.name`/`user.email`; set `DEB_MAINTAINER="Name <email>"` to override it. The executable needs glibc 2.38 or newer (Ubuntu 24.04, Debian 13 or later). Pass `linux-arm64` to build for ARM, which requires an arm64 cross toolchain.
 
 ### Icon
 
